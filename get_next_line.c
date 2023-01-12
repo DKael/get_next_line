@@ -14,4 +14,6 @@
 char *get_next_line(int fd)
 {
 	static t_fdnode	*start = NULL;
+
+	
 }

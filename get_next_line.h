@@ -18,11 +18,13 @@
 
 # include <unistd.h>
 # include <stdlib.h>
+# include <stddef.h>
 
 typedef unsigned int fd;
 typedef struct s_fdnode
 {
 	fd 				fd;
+	int				index;
 	char 			buffer[BUFFER_SIZE];
 	struct s_fdnode	*next;
 }	t_fdnode;
