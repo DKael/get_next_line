@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "get_next_line.h"
+#include "get_next_line_utils.c"
 
 #include <stdio.h>
 
@@ -18,8 +19,6 @@ char *get_next_line(int fd)
 	static t_node	nstart;
 	t_node	*iter;
 
-	// fd에 해당하는 노드 찾기
-	// 0이면 스타트에서 멈춰있고, 0이 아닌 숫자중 찾으면 해당 노드에서 멈춰있고, 못 찾으면 노드 생성
 	iter = &nstart;
 	while (iter != NULL && iter->fd != fd)
 		iter = iter->next;
@@ -31,55 +30,98 @@ char *get_next_line(int fd)
 		iter->fd = fd;
 		iter->index = 0;
 		iter->next = nstart.next;
+		iter->before = &nstart;
+		iter->next->before = iter;
 		nstart.next = iter;
 	}
-	// 해당 iter는 해당 fd의 노드 주소를 가지고 있음
-	// 이제 읽기
-	int 	read_cnt;
+//---------------------------------------------------------------------------------------------
 	int		idx;
 	char	*result;
 	t_temp	tstart;
 
+	tstart.size = 0;
+	(tstart.buffer)[0] = '\0';
+	tstart.next = NULL;
 	if (iter->index != 0)
 	{
 		idx = iter->index;
-		while (idx <= iter->back && iter->buffer[idx] != '\n' && iter->buffer[idx] != EOF)
+		while (idx < BUFFER_SIZE && iter->buffer[idx] != '\n' && idx < iter->back)
 			idx++;
-		tstart.size = iter->back - iter->index + 1;
-		if (iter->buffer[idx] == '\n')
-			tstart.size == idx - iter->index + 1;
-		else if (iter->buffer[idx] == EOF)
-			tstart.size == idx - iter->index;
-		if (idx == iter->back + 1)
-			ft_memcpy(tstart.buffer, &(iter->buffer[iter->index]), tstart.size);
-		else if (iter->buffer[idx] == '\n' || iter->buffer[idx] == EOF)
+		if (idx == BUFFER_SIZE)
 		{
-			result = (char *)malloc(sizeof(char) * tstart.size);
+			tstart.size = idx - iter->index;
+			ft_memcpy(tstart.buffer, &(iter->buffer[iter->index]), tstart.size);
+		}
+		else if (iter->buffer[idx] == '\n')
+		{
+			result = (char *)malloc(sizeof(char) * (idx - iter->index + 2));
 			if (result == NULL)
 				return (NULL);
-			ft_memcpy(result, &(iter->buffer[iter->index]), tstart.size);
+			ft_memcpy(result, &(iter->buffer[iter->index]), idx - iter->index + 1);
+			result[idx - iter->index + 1] = '\0';
 			iter->index = idx + 1;
 			return (result);
 		}
-	}
-	read_cnt = read(fd, iter->buffer, BUFFER_SIZE);
-	if (read_cnt < BUFFER_SIZE)
-	{
-		idx = -1;
-		while (++idx < read_cnt && iter->buffer[idx] != '\n')
+		else
 		{
-			
+			result = (char *)malloc(sizeof(char) * (idx - iter->index + 1));
+			if (result == NULL)
+				return (NULL);
+			ft_memcpy(result, &(iter->buffer[iter->index]), idx - iter->index);
+			result[idx - iter->index] = '\0';
+			if (iter->fd != 0)
+			{
+				if (iter->next != NULL)
+					iter->next->before = iter->before;
+				iter->before->next = iter->next;
+				free(iter);
+			}
+			return (result);
 		}
 	}
-	while (read_cnt != EOF || read_cnt < BUFFER_SIZE)
+//---------------------------------------------------------------------------------------------
+	int 	read_cnt;
+	int		idx1;
+	t_temp	*tmake;
+	t_temp	*position;
+
+	read_cnt = read(fd, iter->buffer, BUFFER_SIZE);
+	if (read_cnt == -1)
+		return (NULL);
+	position = &tstart;
+	while (read_cnt == BUFFER_SIZE)
 	{
+		idx1 = 0;
+		while (idx1 < BUFFER_SIZE && iter->buffer[idx1] != '\n')
+			idx1++;
+		tmake = (t_temp *)malloc(sizeof(t_temp));
+		if (tmake == NULL)
+			return (ft_lstclear(tstart.next));
+		ft_memcpy(tmake->buffer, iter->buffer, idx1 + 1);
+		position->next = tmake;
+		position = tmake;
+		if (iter->buffer[idx1] == '\n')
+		{
+			iter->back = read_cnt;
+			iter->index = idx1 + 1;
+			return (do_concat(&tstart));
+		}
 		read_cnt = read(fd, iter->buffer, BUFFER_SIZE);
 	}
+
+
 
 	return 0;
 }
 
+#include <fcntl.h>
 int main()
 {
-	get_next_line(0);
+	int fd = open("a.txt", O_RDONLY);
+	char x[20];
+	int count = read(fd, x, 20);
+	for (int i = 0; i <= 20; i++)
+	{
+		write(2, x, 1);
+	}
 }

@@ -49,3 +49,4 @@ void	*ft_lstclear(t_temp **lst)
 	}
 	return (NULL);
 }
+

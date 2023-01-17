@@ -29,13 +29,14 @@ typedef struct s_node
 	int				back;
 	char 			buffer[BUFFER_SIZE];
 	struct s_node	*next;
+	struct s_node	*before;
 }	t_node;
 
 typedef struct s_temp
 {
 	int				size;
 	char			buffer[BUFFER_SIZE];
-	struct	s_temp	*next;
+	struct s_temp	*next;
 }	t_temp;
 
 char	*get_next_line(int fd);
