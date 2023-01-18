@@ -50,3 +50,32 @@ void	*ft_lstclear(t_temp **lst)
 	return (NULL);
 }
 
+char	*do_concat(t_temp *tstart)
+{
+	char	*result;
+	int		len;
+	int		idx;
+	t_temp	*position;
+
+	position = tstart;
+	len = 0;
+	while (position != NULL)
+	{
+		len += position->size;
+		position = position->next;
+	}
+	result = (char *)malloc(sizeof(char) * (len + 1));
+	if (result == NULL)
+		return (NULL);
+	position = tstart;
+	idx = 0;
+	while (position != NULL)
+	{
+		ft_memcpy(&result[idx], position->buffer, position->size);
+		idx += position->size;
+		position = position->next;
+	}
+	result[len] = '\0';
+	ft_lstclear(&(tstart->next));
+	return (result);
+}

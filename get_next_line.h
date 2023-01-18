@@ -13,10 +13,8 @@
 # define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-# define BUFFER_SIZE 4096
+# define BUFFER_SIZE 100
 # endif
-
-# define	EOF	(-1)
 
 # include <unistd.h>
 # include <stdlib.h>
@@ -26,10 +24,9 @@ typedef struct s_node
 {
 	unsigned int	fd;
 	int				index;
-	int				back;
+	int				end;
 	char 			buffer[BUFFER_SIZE];
 	struct s_node	*next;
-	struct s_node	*before;
 }	t_node;
 
 typedef struct s_temp
@@ -42,5 +39,6 @@ typedef struct s_temp
 char	*get_next_line(int fd);
 void	*ft_memcpy(void *dst, const void *src, size_t n);
 void	*ft_lstclear(t_temp **lst);
+char	*do_concat(t_temp *tstart);
 
 #endif
