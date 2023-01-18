@@ -18,16 +18,15 @@
 
 # include <unistd.h>
 # include <stdlib.h>
-# include <stddef.h>
 
-typedef struct s_node
+typedef struct s_fd
 {
-	unsigned int	fd;
-	int				index;
-	int				end;
-	char 			buffer[BUFFER_SIZE];
-	struct s_node	*next;
-}	t_node;
+	int			fd;
+	int			start;
+	int			end;
+	char		buffer[BUFFER_SIZE];
+	struct s_fd	*next;
+}	t_fd;
 
 typedef struct s_temp
 {
@@ -36,9 +35,23 @@ typedef struct s_temp
 	struct s_temp	*next;
 }	t_temp;
 
+typedef struct s_data
+{
+	t_fd	*iter;
+	t_fd	*iter_back;
+	t_temp	node;
+}	t_data;
+
 char	*get_next_line(int fd);
-void	*ft_memcpy(void *dst, const void *src, size_t n);
+
+char	*get_result(t_fd **nstart, t_data data);
+char	*read_lines1(t_fd **fd_start, t_data data);
+char	*read_lines2(t_fd **fd_start, t_data data);
+char	*return_remains(t_fd **fd_start, t_data data, int idx, t_fd	*it);
+
+void	*ft_memmove(void *dst, const void *src, size_t n);
 void	*ft_lstclear(t_temp **lst);
 char	*do_concat(t_temp *tstart);
-
+void	*free_fd_and_node(t_fd **fd_start, t_data data);
+char	*make_node(t_fd **fd_start, t_data data, t_temp **tmake, t_temp **pos)
 #endif

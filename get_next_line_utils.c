@@ -11,21 +11,26 @@
 /* ************************************************************************** */
 #include "get_next_line.h"
 
-void	*ft_memcpy(void *dst, const void *src, size_t n)
+void	*ft_memmove(void *dst, const void *src, size_t len)
 {
 	size_t			index;
-	unsigned char	*dst_char;
-	unsigned char	*src_char;
+	unsigned char	*dst_cptr;
+	unsigned char	*src_cptr;
 
+	index = -1;
+	dst_cptr = (unsigned char *)dst;
+	src_cptr = (unsigned char *)src;
 	if (dst != NULL || src != NULL)
 	{
-		index = 0;
-		dst_char = (unsigned char *)dst;
-		src_char = (unsigned char *)src;
-		while (index < n)
+		if (src - dst > 0)
 		{
-			dst_char[index] = src_char[index];
-			index++;
+			while (++index < len)
+				dst_cptr[index] = src_cptr[index];
+		}
+		else
+		{
+			while (++index < len)
+				dst_cptr[len - index - 1] = src_cptr[len - index - 1];
 		}
 	}
 	return (dst);
@@ -34,15 +39,15 @@ void	*ft_memcpy(void *dst, const void *src, size_t n)
 void	*ft_lstclear(t_temp **lst)
 {
 	t_temp	*delete;
-	t_temp	*next_node;
+	t_temp	*next_fd;
 
 	if ((*lst) != NULL)
 	{
-		next_node = (*lst);
-		while (next_node != NULL)
+		next_fd = (*lst);
+		while (next_fd != NULL)
 		{
-			delete = next_node;
-			next_node = next_node->next;
+			delete = next_fd;
+			next_fd = next_fd->next;
 			free(delete);
 		}
 		*lst = NULL;
@@ -65,13 +70,11 @@ char	*do_concat(t_temp *tstart)
 		position = position->next;
 	}
 	result = (char *)malloc(sizeof(char) * (len + 1));
-	if (result == NULL)
-		return (NULL);
 	position = tstart;
 	idx = 0;
 	while (position != NULL)
 	{
-		ft_memcpy(&result[idx], position->buffer, position->size);
+		ft_memmove(&result[idx], position->buffer, position->size);
 		idx += position->size;
 		position = position->next;
 	}

@@ -10,147 +10,157 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "get_next_line.h"
-#include "get_next_line_utils.c"
 
 #include <stdio.h>
 
-char *get_next_line(int fd)
+char	*get_next_line(int fd)
 {
-	static t_node	*nstart;
-	t_node			*iter;
-	t_node			*iter_back;
+	static t_fd	*fd_start;
+	t_data		data;
 
-	iter = nstart;
-	while (iter != NULL && iter->fd != fd)
+	data.iter = fd_start;
+	while (data.iter != NULL && data.iter->fd != fd)
 	{
-		iter_back = iter;
-		iter = iter->next;
+		data.iter_back = data.iter;
+		data.iter = data.iter->next;
 	}
-	if (iter == NULL)
+	if (data.iter == NULL)
 	{
-		iter = (t_node *)malloc(sizeof(t_node));
-		if (iter == NULL)
+		data.iter = (t_fd *)malloc(sizeof(t_fd));
+		if (data.iter == NULL)
 			return (NULL);
-		iter->fd = fd;
-		iter->index = 0;
-		iter->next = nstart;
-		nstart = iter;
-		iter_back = nstart;
+		data.iter->fd = fd;
+		data.iter->start = 0;
+		data.iter->next = fd_start;
+		fd_start = data.iter;
+		data.iter_back = fd_start;
 	}
-//---------------------------------------------------------------------------------------------
-	int		idx;
-	char	*result;
-	t_temp	tstart;
+	data.node.size = 0;
+	(data.node.buffer)[0] = '\0';
+	if (data.iter->start != 0)
+		return (get_result(&fd_start, data));
+	return (read_lines(&fd_start, data));
+}
 
-	tstart.size = 0;
-	(tstart.buffer)[0] = '\0';
-	tstart.next = NULL;
-	if (iter->index != 0)
+char	*get_result(t_fd **fd_start, t_data data)
+{
+	int		idx;
+	t_fd	*it;
+
+	it = data.iter;
+	idx = it->start;
+	while (idx < BUFFER_SIZE && it->buffer[idx] != '\n' && idx < it->end)
+		idx++;
+	if (idx == BUFFER_SIZE)
 	{
-		idx = iter->index;
-		while (idx < BUFFER_SIZE && iter->buffer[idx] != '\n' && idx < iter->end)
-			idx++;
-		if (idx == BUFFER_SIZE)
-		{
-			tstart.size = idx - iter->index;
-			ft_memcpy(tstart.buffer, &(iter->buffer[iter->index]), tstart.size);
-		}
-		else if (iter->buffer[idx] == '\n')
-		{
-			result = (char *)malloc(sizeof(char) * (idx - iter->index + 2));
-			if (result == NULL)
-				return (NULL);
-			result[idx - iter->index + 1] = '\0';
-			ft_memcpy(result, &(iter->buffer[iter->index]), idx - iter->index + 1);
-			iter->index = idx + 1;
-			return (result);
-		}
-		else
-		{
-			result = (char *)malloc(sizeof(char) * (idx - iter->index + 1));
-			if (result == NULL)
-				return (NULL);
-			result[idx - iter->index] = '\0';
-			ft_memcpy(result, &(iter->buffer[iter->index]), idx - iter->index);
-			if (iter != iter_back)
-				iter_back->next = iter->next;
-			else
-				nstart = iter->next;
-			free(iter);
-			return (result);
-		}
+		data.node.size = idx - it->start;
+		ft_memmove(data.node.buffer, &(it->buffer[it->start]), data.node.size);
+		return (read_lines(&fd_start, data));
 	}
-//---------------------------------------------------------------------------------------------
+	else
+		return (return_remains(&fd_start, data, idx, it));
+}
+
+char	*return_remains(t_fd **fd_start, t_data data, int idx, t_fd	*it)
+{
+	int		flag;
+	char	*result;
+
+	flag = 0;
+	if (data.iter->buffer[idx] == '\n')
+		flag = 1;
+	result = (char *)malloc(sizeof(char) * (idx - it->start + flag + 1));
+	if (result == NULL)
+		return (free_fd_and_node(&fd_start, data));
+	result[idx - it->start + flag] = '\0';
+	ft_memmove(result, &(it->buffer[it->start]), idx - it->start + flag);
+	if (flag == 1)
+		it->start = idx + 1;
+	else
+		free_fd_and_node(&fd_start, data);
+	return (result);
+}
+
+void	*free_fd_and_node(t_fd **fd_start, t_data data)
+{
+	if (data.iter != data.iter_back)
+		data.iter_back->next = data.iter->next;
+	else
+		*fd_start = data.iter->next;
+	free(data.iter);
+	return (ft_lstclear(&(data.node.next)));
+}
+
+char	*read_lines(t_fd **fd_start, t_data data)
+{
 	int 	read_cnt;
 	int		idx1;
 	t_temp	*tmake;
 	t_temp	*pos;
 
-	read_cnt = read(fd, iter->buffer, BUFFER_SIZE);
+	read_cnt = read(data.iter->fd, data.iter->buffer, BUFFER_SIZE);
 	if (read_cnt == -1 || read_cnt == 0)
-		return (NULL);
-	pos = &tstart;
+		return (free_fd_and_node(&fd_start, data));
+	pos = &(data.node);
 	while (read_cnt == BUFFER_SIZE)
 	{
 		tmake = (t_temp *)malloc(sizeof(t_temp));
 		if (tmake == NULL)
-			return (ft_lstclear(&(tstart.next)));
+			return (free_fd_and_node(&fd_start, data));
 		tmake->next = NULL;
 		pos->next = tmake;
 		pos = tmake;
 		tmake->size = BUFFER_SIZE;
 		idx1 = 0;
-		while (idx1 < BUFFER_SIZE && iter->buffer[idx1] != '\n')
+		while (idx1 < BUFFER_SIZE && data.iter->buffer[idx1] != '\n')
 			idx1++;
-		if (iter->buffer[idx1] == '\n')
+		if (data.iter->buffer[idx1] == '\n')
 		{
-			ft_memcpy(tmake->buffer, iter->buffer, idx1 + 1);
+			ft_memmove(tmake->buffer, data.iter->buffer, idx1 + 1);
 			if (idx1 + 1 != read_cnt)
 			{
-				iter->end = read_cnt;
-				iter->index = idx1 + 1;
+				data.iter->end = read_cnt;
+				data.iter->start = idx1 + 1;
 			}
 			else
-				iter->index = 0;
+				data.iter->start = 0;
 			tmake->size = idx1 + 1;
-			return (do_concat(&tstart));
+			return (do_concat(&(data.node)));
 		}
 		else
-			ft_memcpy(tmake->buffer, iter->buffer, idx1);
-		read_cnt = read(fd, iter->buffer, BUFFER_SIZE);
+			ft_memmove(tmake->buffer, data.iter->buffer, idx1);
+		read_cnt = read(data.iter->fd, data.iter->buffer, BUFFER_SIZE);
 		if (read_cnt == -1 || read_cnt == 0)
-			return (ft_lstclear(&(tstart.next)));
+			return (free_fd_and_node(&fd_start, data));
 	}
-//---------------------------------------------------------------------------------------------
+//-------------------------------------------
 	tmake = (t_temp *)malloc(sizeof(t_temp));
-	if (tmake == NULL)
-		return (ft_lstclear(&(tstart.next)));
 	tmake->next = NULL;
 	pos->next = tmake;
 	idx1 = 0;
-	while (idx1 < read_cnt && iter->buffer[idx1] != '\n')
+	while (idx1 < read_cnt && data.iter->buffer[idx1] != '\n')
 		idx1++;
-	if (iter->buffer[idx1] == '\n')
+	if (data.iter->buffer[idx1] == '\n')
 	{
-		ft_memcpy(tmake->buffer, iter->buffer, idx1 + 1);
+		ft_memmove(tmake->buffer, data.iter->buffer, idx1 + 1);
 		if (idx1 + 1 != read_cnt)
 		{
-			iter->end = read_cnt;
-			iter->index = idx1 + 1;
+			data.iter->end = read_cnt;
+			data.iter->index = idx1 + 1;
 		}
 		else
-			iter->index = 0;
+			data.iter->index = 0;
 		tmake->size = idx1 + 1;
 	}
 	else
 	{
-		ft_memcpy(tmake->buffer, iter->buffer, idx1);
-		if (iter != iter_back)
-			iter_back->next = iter->next;
+		ft_memmove(tmake->buffer, data.iter->buffer, idx1);
+		if (data.iter != data.iter_back)
+			data.iter_back->next = data.iter->next;
 		else
-			nstart = iter->next;
-		free(iter);
+			nstart = data.iter->next;
+		free(data.iter);
 		tmake->size = idx1;
 	}
-	return (do_concat(&tstart));
+	return (do_concat(&(data.tstart)));
 }
