@@ -19,7 +19,6 @@ char *get_next_line(int fd)
 	static t_node	*nstart;
 	t_node			*iter;
 	t_node			*iter_back;
-	int				read_cnt1;
 
 	iter = nstart;
 	while (iter != NULL && iter->fd != fd)
@@ -61,8 +60,8 @@ char *get_next_line(int fd)
 			result = (char *)malloc(sizeof(char) * (idx - iter->index + 2));
 			if (result == NULL)
 				return (NULL);
-			ft_memcpy(result, &(iter->buffer[iter->index]), idx - iter->index + 1);
 			result[idx - iter->index + 1] = '\0';
+			ft_memcpy(result, &(iter->buffer[iter->index]), idx - iter->index + 1);
 			iter->index = idx + 1;
 			return (result);
 		}
@@ -71,8 +70,8 @@ char *get_next_line(int fd)
 			result = (char *)malloc(sizeof(char) * (idx - iter->index + 1));
 			if (result == NULL)
 				return (NULL);
-			ft_memcpy(result, &(iter->buffer[iter->index]), idx - iter->index);
 			result[idx - iter->index] = '\0';
+			ft_memcpy(result, &(iter->buffer[iter->index]), idx - iter->index);
 			if (iter != iter_back)
 				iter_back->next = iter->next;
 			else
@@ -147,7 +146,7 @@ char *get_next_line(int fd)
 	{
 		ft_memcpy(tmake->buffer, iter->buffer, idx1);
 		if (iter != iter_back)
-				iter_back->next = iter->next;
+			iter_back->next = iter->next;
 		else
 			nstart = iter->next;
 		free(iter);
