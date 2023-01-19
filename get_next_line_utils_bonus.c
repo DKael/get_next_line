@@ -1,15 +1,15 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hyungdki <hyungdki@student.42seoul.>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/12 16:07:13 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/01/12 16:07:14 by hyungdki         ###   ########.fr       */
+/*   Created: 2023/01/19 21:00:09 by hyungdki          #+#    #+#             */
+/*   Updated: 2023/01/19 21:00:11 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 void	*ft_memmove(void *dst, const void *src, size_t len)
 {

@@ -1,15 +1,15 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hyungdki <hyungdki@student.42seoul.>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/12 16:06:51 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/01/12 16:06:52 by hyungdki         ###   ########.fr       */
+/*   Created: 2023/01/19 20:59:42 by hyungdki          #+#    #+#             */
+/*   Updated: 2023/01/19 20:59:43 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 #include <stdio.h>
 
