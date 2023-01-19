@@ -84,7 +84,7 @@ char	*do_concat(t_lnode *tstart)
 	return (result);
 }
 
-void	*free_fd_and_node(t_data *data)
+void	*free_fd_and_node(t_data *data, int flag)
 {
 	if ((*data).it != (*data).it_back)
 	{
@@ -94,9 +94,12 @@ void	*free_fd_and_node(t_data *data)
 			(*data).it_back->next = NULL;
 	}
 	else
-		*((*data).fd_start) = (*data).it->next;
+		*((*data).fd_start) = NULL;
 	free((*data).it);
-	return (ft_lstclear(&((*data).node.next)));
+	if (flag == 1)
+		return (ft_lstclear(&((*data).node.next)));
+	else
+		return (NULL);
 }
 
 void	parse(t_data *data, int *idx, t_lnode **pos, t_lnode **tmake)

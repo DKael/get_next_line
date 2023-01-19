@@ -67,7 +67,7 @@ char	*get_buffer_remains(t_data *data)
 	else
 		result = read_lines1(data);
 	if (result == NULL)
-		return (free_fd_and_node(data));
+		return (free_fd_and_node(data, CLEAN_ALL));
 	return (result);
 }
 
@@ -92,11 +92,8 @@ char	*case_nl_eof(t_data *data, int idx, t_fd_node *it)
 			return (NULL);
 		result[idx - it->start] = '\0';
 		ft_memmove(result, &(it->bf[it->start]), idx - it->start);
-		if ((*data).it != (*data).it_back)
-			(*data).it_back->next = (*data).it->next;
-		else
-			*((*data).fd_start) = (*data).it->next;
-		return (free((*data).it), result);
+		free_fd_and_node(data, CLEAN_FD_ONLY);
+		return (result);
 	}
 }
 
@@ -130,23 +127,14 @@ char	*read_lines2(t_data *data, int *idx, t_lnode **pos, t_lnode **tmake)
 {
 	if ((*data).it->read == 0 && (*data).node.size != 0)
 	{
-		if ((*data).it != (*data).it_back)
-			(*data).it_back->next = (*data).it->next;
-		else
-			*((*data).fd_start) = (*data).it->next;
-		return (free((*data).it), do_concat(&((*data).node)));
+		free_fd_and_node(data, CLEAN_FD_ONLY);
+		return (do_concat(&((*data).node)));
 	}
 	(*idx) = 0;
 	parse(data, idx, pos, tmake);
 	if ((*tmake) == NULL)
 		return (NULL);
 	if ((*data).it->bf[(*idx)] != '\n')
-	{
-		if ((*data).it != (*data).it_back)
-			(*data).it_back->next = (*data).it->next;
-		else
-			*((*data).fd_start) = (*data).it->next;
-		free((*data).it);
-	}
+		free_fd_and_node(data, CLEAN_FD_ONLY);
 	return (do_concat(&((*data).node)));
 }

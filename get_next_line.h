@@ -16,6 +16,9 @@
 #  define BUFFER_SIZE 42
 # endif
 
+# define CLEAN_FD_ONLY	0
+# define CLEAN_ALL 		1
+
 # include <unistd.h>
 # include <stdlib.h>
 
@@ -52,7 +55,7 @@ char	*read_lines2(t_data *data, int *idx, t_lnode **pos, t_lnode **tmake);
 void	*ft_memmove(void *dst, const void *src, size_t n);
 void	*ft_lstclear(t_lnode **lst);
 char	*do_concat(t_lnode *tstart);
-void	*free_fd_and_node(t_data *data);
+void	*free_fd_and_node(t_data *data, int flag);
 void	parse(t_data *data, int *idx, t_lnode **pos, t_lnode **tmake);
 
 #endif
