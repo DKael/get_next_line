@@ -9,7 +9,7 @@
 /*   Updated: 2023/01/23 17:24:01 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 void	*ft_memmove(void *dst, const void *src, size_t len)
 {
