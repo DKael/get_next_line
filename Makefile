@@ -15,12 +15,12 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
 SRCS =	get_next_line.c	\
-		    get_next_line_utils.c \
+		get_next_line_utils.c \
 
 OBJS = 	${SRCS:.c=.o}
 
 SRCS_BONUS =	get_next_line_bonus.c	\
-		          get_next_line_utils_bonus.c \
+		        get_next_line_utils_bonus.c \
 
 OBJS_BONUS = 	${SRCS_BONUS:.c=.o}
 
