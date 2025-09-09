@@ -86,13 +86,15 @@ main.c와 함께 컴파일 후 실행:
     gcc main.c -L. -lgnl -o main
     ./main
 ```
+
 ---
 
 ## 7️⃣ 기술 스택
 	•	언어: C
-	•	빌드 도구: GNU Make
+ 	•	운영체제/환경: Unix/Linux
+ 	•	빌드 도구: GNU Make
+ 	•	Coding Conventions: Norminette
 	•	시스템 콜: read
-	•	환경: Unix (Linux, macOS)
 
 ---
 
